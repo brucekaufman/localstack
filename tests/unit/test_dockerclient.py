@@ -154,6 +154,7 @@ class TestPortMappings(unittest.TestCase):
         port_mappings.add(5001)
         port_mappings.add(5003)
         port_mappings.add([5004, 5006], 9000)
+        port_mappings.add([5004, 5006], 5004)
         result = port_mappings.to_str()
         self.assertEqual(
             "-p 0.0.0.0:5000-5001:5000-5001 -p 0.0.0.0:5003:5003 -p 0.0.0.0:5004-5006:9000", result
@@ -196,4 +197,25 @@ class TestPortMappings(unittest.TestCase):
             "7000/tcp": [7000, 7001, 7002],
         }
         result = port_mappings.to_dict()
+        self.assertEqual(expected_result, result)
+    
+    def test_to_list(self):
+        port_mappings = PortMappings()
+        port_mappings.add(4590)
+        port_mappings.add(4591)
+        port_mappings.add([7000, 7002], 7000)
+        result = port_mappings.to_list()
+        expected_result = [
+            '-p',
+            '4590-4591:4590-4591',
+            '-p',
+            '7000-7002:7000'
+        ]
+        self.assertEqual(expected_result, result)
+    
+    def test_many_to_one(self):
+        port_mappings = PortMappings()
+        port_mappings.add([19891, 19895], 19891)
+        result = port_mappings.to_str()
+        expected_result = "-p 19891-19895:19891"
         self.assertEqual(expected_result, result)

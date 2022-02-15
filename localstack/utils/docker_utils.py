@@ -119,7 +119,7 @@ class PortMappings(object):
                 if not self.in_range(mapped, to_range):
                     continue
                 # extending a 1 to 1 mapping to be many to 1
-                elif from_range_len == 1:
+                elif to_range_len == 0:
                     self.expand_range(port, from_range)
                 # splitting a uniform mapping
                 else:
@@ -158,6 +158,8 @@ class PortMappings(object):
             protocol = "/%s" % k[2] if k[2] != "tcp" else ""
             if k[0] == k[1] and v[0] == v[1]:
                 return ["-p", f"{bind_address}{k[0]}:{v[0]}{protocol}"]
+            if k[0] != k[1] and v[0] == v[1]:
+                return ["-p", f"{bind_address}{k[0]}-{k[1]}:{v[0]}{protocol}"]
             return ["-p", f"{bind_address}{k[0]}-{k[1]}:{v[0]}-{v[1]}{protocol}"]
 
         return [item for k, v in self.mappings.items() for item in entry(k, v)]
